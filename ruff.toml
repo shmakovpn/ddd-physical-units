@@ -1,0 +1,30 @@
+# Какие правила включать
+lint.select = [
+    "E", "F", "I", "B",
+
+    # Проверки типов
+    "TC",
+    "TCH",  # Требует правильных типов в аннотациях
+    "PT",   # flake8-pyi
+    "ANN",  # flake8-annotations
+    "UP", 
+    "S", 
+    "ASYNC"
+]
+
+# Максимальная длина строки
+line-length = 120
+
+# Исключения
+exclude = [
+    ".git",
+    ".github",
+    ".vscode",
+    ".idea",
+    "__pycache__",
+    ".pytest_cache",
+    ".venv",
+    "build",
+    "doc",
+    "requirements",
+]
