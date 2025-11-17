@@ -12,6 +12,8 @@ lint.select = [
     "ASYNC"
 ]
 
+target-version = "py314"
+
 # Максимальная длина строки
 line-length = 120
 
@@ -28,3 +30,6 @@ exclude = [
     "doc",
     "requirements",
 ]
+
+[lint.per-file-ignores]
+"pytests/**/*.py" = ["S101"]
