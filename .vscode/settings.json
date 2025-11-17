@@ -1,4 +1,6 @@
 {
-  "cSpell.words": ["pytest", "venv"],
-  "CodeGPT.apiKey": "CodeGPT Plus Beta"
+  "cSpell.words": ["pytest", "pytests", "venv"],
+  "python.testing.pytestArgs": ["pytests"],
+  "python.testing.unittestEnabled": false,
+  "python.testing.pytestEnabled": true
 }
