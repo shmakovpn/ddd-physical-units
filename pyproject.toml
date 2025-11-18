@@ -12,7 +12,7 @@ where = ["src"]
 
 [project]
 name = "ddd-physical-units"
-version = "1.0.0"
+version = "0.0.0"
 description = "Support for units of measurement in domain-oriented design in Python."
 readme = "README.md"
 authors = [{ name = "Pavel Shmakov", email = "shmakovpn@yandex.ru" }]

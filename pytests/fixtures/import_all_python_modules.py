@@ -1,9 +1,12 @@
 import importlib
 import pathlib
 import sys
-import types
+from typing import TYPE_CHECKING
 
 import pytest
+
+if TYPE_CHECKING:
+    import types
 
 __all__ = (
     'import_all_python_src_modules__fixture',
