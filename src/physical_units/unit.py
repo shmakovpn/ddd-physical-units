@@ -1,10 +1,19 @@
 
-from .exceptions import UnitFormulaAlreadyRegisteredError, UnitLabelAlreadyRegisteredError
+from .exceptions import (
+    NoneBaseUnitLabelError,
+    UnitFormulaAlreadyRegisteredError,
+    UnitLabelAlreadyRegisteredError,
+    WrongBaseNumeratorError,
+    NoneInNumeratorError,
+    NoneInDenominatorError,
+    EmptyInNumeratorError,
+    EmptyInDenominatorError,
+)
 from .formula import Formula
 from .type_hints import Denominator, Numerator, UnitLabel
 
 __all__ = (
-    'BasePhysicalUnitOld',
+    'Unit',
 )
 
 """
@@ -55,8 +64,36 @@ class Unit:
                 cls._instances_by_label[label] = physical_unit
                 cls._instances_by_formula[formula] = physical_unit
                 return None
+    
+    @classmethod
+    def _validate_label_and_formula(cls, label: str | None, formula: Formula) -> None:
+        if formula.is_base_unit():
+            if label is None:
+                msg = 'У базовой единицы измерения label не может быть None'
+                raise NoneBaseUnitLabelError(msg)
+            
+            if label != formula.numerator[0]:
+                msg = 'У базовой единицы измерения label должен совпадать с numerator[0]'
+                raise WrongBaseNumeratorError(msg)
+        
+        if None in formula.numerator:
+            msg = 'Не должно быть None в числителе'
+            raise NoneInNumeratorError(msg)
+        
+        if None in formula.denominator:
+            msg = 'Не должно быть None в знаменателе'
+            raise NoneInDenominatorError(msg)
+        
+        if '' in formula.numerator:
+            msg = 'Не должно быть пустых строк в числителе'
+            raise EmptyInNumeratorError(msg)
+        
+        if '' in formula.denominator:
+            msg = 'Не должно быть пустых строк в знаменателе'
+            raise EmptyInDenominatorError(msg)
 
     def __new__(cls, label: str | None, formula: Formula) -> Unit:
+        cls._validate_label_and_formula(label=label, formula=formula)
         instance: Unit | None = cls.Registry.get_physical_unit(formula=formula)
         if instance:
             # единица измерения с такой формулой уже существует

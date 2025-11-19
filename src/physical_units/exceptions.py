@@ -2,6 +2,12 @@ __all__ = (
     'UnitLabelAlreadyRegisteredError',
     'UnitFormulaAlreadyRegisteredError',
     'EmptyFormulaError',
+    'NoneBaseUnitLabelError',
+    'WrongBaseNumeratorError',
+    'NoneInNumeratorError',
+    'NoneInDenominatorError',
+    'EmptyInNumeratorError',
+    'EmptyInDenominatorError',
 )
 
 
@@ -20,3 +26,27 @@ class EmptyFormulaError(ValueError):
     """
     Попытка создать единицу измерения с пустой формулой
     """
+
+
+class NoneBaseUnitLabelError(ValueError):
+    """У базовой единицы измерения label не может быть None"""
+
+
+class WrongBaseNumeratorError(ValueError):
+    """У базовой единицы измерения label должен совпадать с numerator[0]"""
+
+
+class NoneInNumeratorError(ValueError):
+    """Не должно быть None в числителе"""
+
+
+class NoneInDenominatorError(ValueError):
+    """Не должно быть None в знаменателе"""
+
+
+class EmptyInNumeratorError(ValueError):
+    """Не должно быть пустых строк в числителе"""
+
+
+class EmptyInDenominatorError(ValueError):
+    """Не должно быть пустых строк в знаменателе"""
