@@ -1,13 +1,13 @@
 
 from .exceptions import (
+    EmptyInDenominatorError,
+    EmptyInNumeratorError,
     NoneBaseUnitLabelError,
+    NoneInDenominatorError,
+    NoneInNumeratorError,
     UnitFormulaAlreadyRegisteredError,
     UnitLabelAlreadyRegisteredError,
     WrongBaseNumeratorError,
-    NoneInNumeratorError,
-    NoneInDenominatorError,
-    EmptyInNumeratorError,
-    EmptyInDenominatorError,
 )
 from .formula import Formula
 from .type_hints import Denominator, Numerator, UnitLabel
@@ -144,6 +144,14 @@ m = meter = Unit(
     label='m', 
     formula=Formula(
         numerator=Numerator('m', ), 
+        denominator=Denominator(),
+    )
+)
+
+s = second = Unit(
+    label='s',
+    formula=Formula(
+        numerator=Numerator('s', ),
         denominator=Denominator(),
     )
 )
