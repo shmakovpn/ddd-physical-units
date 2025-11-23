@@ -51,35 +51,37 @@ class TestMeter:
 
     def test_singleton(self) -> None:
         pass
+
+    def test__srt(self) -> None:
+        assert str(tm.meter) == tm.meter.label
     
-    # TODO перенести в Value (Unit + Value) 
-    # def test__str(self) -> None:
-    #    assert str(tm.m) == f'1{tm.m.label}'
-    # 
-    # def test__eq(self) -> None:
-    #    with pytest.raises(TypeError):
-    #        _ = m == UnsupportedType()
-    #    
-    #    with pytest.raises(TypeError):
-    #        _ = m != UnsupportedType()
-    #    
-    #    assert Meter(value=2) == Meter(value=2)
-    #   assert Meter(value=2) != Meter(value=3)
-    #
-    # def test__mul(self) -> None:
-    #    with pytest.raises(TypeError):
-    #        m*UnsupportedType()
-    #    
-    #    with pytest.raises(TypeError):
-    #        m*None
-    #
-    #    assert m*2 == Meter(2)
-    #
-    # def test__rmul(self) -> None:
-    #     with pytest.raises(TypeError):
-    #        UnsupportedType()*m
-    #    
-    #    with pytest.raises(TypeError):
-    #        None*m
-    #    
-    #    assert 3*m == Meter(3)
+    def test__eq(self) -> None:
+        assert tm.m == tm.meter
+
+        with pytest.raises(ValueError):
+            _ = tm.m == tm.s
+        
+        with pytest.raises(TypeError):
+            _ = tm.m == UnsupportedType()
+    
+    def test__mul(self) -> None:
+        # проверяем умножение на число
+        result = tm.m * 3
+        assert isinstance(result, tm.Quantity)
+        assert result.value == 3
+        assert result.unit == tm.m
+
+        # проверяем умножение на неподдерживаемый тип
+        with pytest.raises(TypeError):
+            _ = tm.m * UnsupportedType()
+    
+    def test__rmul(self) -> None:
+        # проверяем умножение на число
+        result = 3 * tm.m
+        assert isinstance(result, tm.Quantity)
+        assert result.value == 3
+        assert result.unit == tm.m
+
+        # проверяем умножение на неподдерживаемый тип
+        with pytest.raises(TypeError):
+            _ = UnsupportedType() * tm.m

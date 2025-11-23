@@ -1,4 +1,4 @@
-
+import dataclasses
 from .exceptions import (
     EmptyInDenominatorError,
     EmptyInNumeratorError,
@@ -14,6 +14,7 @@ from .type_hints import Denominator, Numerator, UnitLabel
 
 __all__ = (
     'Unit',
+    'Quantity',
 )
 
 """
@@ -117,20 +118,22 @@ class Unit:
         self.formula = formula
     
     def __str__(self) -> str:
-        return f'{self.value!r}{self.label}'
+        return self.label
 
     def __eq__(self, value: Unit) -> bool:
-        if not isinstance(value, self.__class__):
-            raise TypeError(f'unable to compare "{type(value).__name__}" with "{self.__class__.__name__}"')
-
-        if self.value == value.value:
+        if id(self) == id(value):
             return True
         
-        return False
+        if isinstance(value, type(self)):
+            # метр можно сравнить только с метром.
+            # сравнение метра с килограммом является ошибкой
+            raise ValueError(f'cannot compare "{value}" with "{self}"')
+        
+        raise TypeError(f'cannot compare type "{type(value).__name__}" with "{self}"')
 
     def __mul__(self, value: int | float | complex | Unit) -> Unit:
         if isinstance(value, (int, float, complex)):
-            result: Unit = self.__class__(value=self.value * value)
+            result: Quantity = Quantity(value=value, unit=self)
             return result
         
         raise TypeError(f'unsupported type "{type(value).__name__}" for __mul__ in "{self.__class__.__name__}"')
@@ -138,6 +141,12 @@ class Unit:
     def __rmul__(self, value: int | float | complex | Unit) -> Unit:
         result = self * value
         return result
+
+
+@dataclasses.dataclass(frozen=True)
+class Quantity:
+    value: float
+    unit: Unit
     
 
 m = meter = Unit(

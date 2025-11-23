@@ -2,5 +2,5 @@
   "cSpell.words": ["pytest", "pytests", "typehints", "venv"],
   "python.testing.pytestArgs": ["pytests"],
   "python.testing.unittestEnabled": false,
-  "python.testing.pytestEnabled": true,
+  "python.testing.pytestEnabled": true
 }
