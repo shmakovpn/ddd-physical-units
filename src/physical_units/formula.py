@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 from .exceptions import EmptyFormulaError
 
 if TYPE_CHECKING:
-    from .type_hints import Denominator, Numerator
+    from .type_hints import Denominator, Numerator, UnitLabel
 
 __all__ = (
     'Formula',
@@ -28,10 +28,6 @@ class Formula:
     Например: Паскаль будет иметь знаменатель `m**2`
     """
 
-    def __post_init__(self) -> None:
-        if len(self.numerator) == 0 and len(self.denominator) == 0:
-            raise EmptyFormulaError('Формула не может быть пустой')
-
     def is_base_unit(self) -> bool:
         """
         True если формула соответствует основной (base) единице измерения.
@@ -41,3 +37,29 @@ class Formula:
             return True
         else:
             return False
+    
+    @staticmethod
+    def _reduce_fraction(numerator: Numerator, denominator: Denominator):
+        numerator_accumulator = list(numerator)
+        denominator_accumulator = list(denominator)
+
+        for unit_label_1 in numerator:
+            for unit_label_2 in denominator_accumulator:
+                if unit_label_1 == unit_label_2:
+                    numerator_accumulator.remove(unit_label_1)
+                    denominator_accumulator.remove(unit_label_2)
+                    break
+        
+        return tuple(numerator_accumulator), tuple(denominator_accumulator)
+    
+    def __mul__(self, value: Formula) -> Formula:
+        if not isinstance(value, Formula):
+            raise TypeError(f'unsupported type "{type(value).__name__}" for __mul__')
+        # перемножение формул должно поддерживать сокращение дробей
+        left_numerator: list[UnitLabel] = list(self.numerator)
+        right_numerator: list[UnitLabel] = list(value.numerator)
+        left_denominator: list[UnitLabel] = list(self.denominator)
+        right_denominator: list[UnitLabel] = list(value.denominator)
+
+        unit: UnitLabel
+        # for unit in left_numerator:

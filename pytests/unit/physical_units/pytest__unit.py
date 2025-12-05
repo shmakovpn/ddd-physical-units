@@ -12,7 +12,6 @@ class UnsupportedType:
 class TestUnit:
     def test_inheritance(self) -> None:
         assert len(tm.Unit.mro()) == 2  # Unit does not have parents
-
     
     def test__validate_label_and_formula(self) -> None:
         # Не должно быть None в числителе
@@ -74,6 +73,10 @@ class TestMeter:
         # проверяем умножение на неподдерживаемый тип
         with pytest.raises(TypeError):
             _ = tm.m * UnsupportedType()
+        
+        # проверяем умножение на другую единицу измерения
+        square_meter = tm.m * tm.m
+
     
     def test__rmul(self) -> None:
         # проверяем умножение на число

@@ -136,6 +136,10 @@ class Unit:
             result: Quantity = Quantity(value=value, unit=self)
             return result
         
+        if isinstance(value, type(self)):
+            # TODO продолжить
+            right_numerator = list(value.formula.numerator)
+        
         raise TypeError(f'unsupported type "{type(value).__name__}" for __mul__ in "{self.__class__.__name__}"')
     
     def __rmul__(self, value: int | float | complex | Unit) -> Unit:
@@ -164,3 +168,15 @@ s = second = Unit(
         denominator=Denominator(),
     )
 )
+
+empty = Unit(
+    label='',
+    formula=Formula(
+        numerator=Numerator(),
+        denominator=(),
+    )
+)
+"""
+Физическая величина без единицы измерения,
+например, количество в штуках.
+"""
