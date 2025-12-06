@@ -1,13 +1,13 @@
 __all__ = (
     'UnitLabelAlreadyRegisteredError',
     'UnitFormulaAlreadyRegisteredError',
-    'EmptyFormulaError',
     'NoneBaseUnitLabelError',
     'WrongBaseNumeratorError',
     'NoneInNumeratorError',
     'NoneInDenominatorError',
     'EmptyInNumeratorError',
     'EmptyInDenominatorError',
+    'UnregisteredLabelInFormulaError',
 )
 
 
@@ -19,12 +19,6 @@ class UnitFormulaAlreadyRegisteredError(RuntimeError):
     """
     Единица измерения с такой формулой уже зарегистрирована.
     Попытка создать единицу измерения с имеющейся формулой, но другим label
-    """
-
-
-class EmptyFormulaError(ValueError):
-    """
-    Попытка создать единицу измерения с пустой формулой
     """
 
 
@@ -50,3 +44,7 @@ class EmptyInNumeratorError(ValueError):
 
 class EmptyInDenominatorError(ValueError):
     """Не должно быть пустых строк в знаменателе"""
+
+
+class UnregisteredLabelInFormulaError(ValueError):
+    """Не зарегистрированный label в формуле"""

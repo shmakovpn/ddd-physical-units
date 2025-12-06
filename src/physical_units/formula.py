@@ -1,10 +1,10 @@
 import dataclasses
 from typing import TYPE_CHECKING
 
-from .exceptions import EmptyFormulaError
+from .type_hints import Denominator, Numerator
 
 if TYPE_CHECKING:
-    from .type_hints import Denominator, Numerator, UnitLabel
+    from .type_hints import UnitLabel
 
 __all__ = (
     'Formula',
@@ -20,7 +20,7 @@ class Formula:
     """
     numerator: Numerator
     """
-    Числитель (numerator) производной (derived) или основной (base) физической величины.
+    Числитель (numerator) производной (derived) или основной (base) физической величины (quantity).
     """
     denominator: Denominator
     """
@@ -39,7 +39,14 @@ class Formula:
             return False
     
     @staticmethod
-    def _reduce_fraction(numerator: Numerator, denominator: Denominator):
+    def _reduce_fraction(numerator: Numerator, denominator: Denominator) -> tuple[Numerator, Denominator]:
+        """
+        Сокращает дробь. Возвращает сокращенную дробь.
+        
+        (a*b)/(c*d) => (a*b)/(c*d)
+        (a*b)/(a*c) => a/c
+        a/a => 1
+        """
         numerator_accumulator = list(numerator)
         denominator_accumulator = list(denominator)
 
@@ -50,7 +57,7 @@ class Formula:
                     denominator_accumulator.remove(unit_label_2)
                     break
         
-        return tuple(numerator_accumulator), tuple(denominator_accumulator)
+        return Numerator(numerator_accumulator), Denominator(denominator_accumulator)
     
     def __mul__(self, value: Formula) -> Formula:
         if not isinstance(value, Formula):

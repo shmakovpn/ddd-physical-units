@@ -1,4 +1,5 @@
 import dataclasses
+
 from .exceptions import (
     EmptyInDenominatorError,
     EmptyInNumeratorError,
@@ -7,6 +8,7 @@ from .exceptions import (
     NoneInNumeratorError,
     UnitFormulaAlreadyRegisteredError,
     UnitLabelAlreadyRegisteredError,
+    UnregisteredLabelInFormulaError,
     WrongBaseNumeratorError,
 )
 from .formula import Formula
@@ -15,10 +17,14 @@ from .type_hints import Denominator, Numerator, UnitLabel
 __all__ = (
     'Unit',
     'Quantity',
+    'm', 'meter',
+    's', 'second',
+    'kg', 'kilogram',
+    'N', 'newton',
 )
 
 """
-7 основных физических величин СИ
+7 основных физических величин (quantities) СИ
  - Длина — метр (m)
  - Масса — килограмм (kg)
  - Время — секунда (s)
@@ -60,11 +66,17 @@ class Unit:
                 # такой label уже зарегистрирован
                 msg = f'label="{label}" уже зарегистрирован в "{cls._instances_by_label[label]}"'
                 raise UnitLabelAlreadyRegisteredError(msg)
-            else:
-                # регистрируем единицу измерения в реестре
-                cls._instances_by_label[label] = physical_unit
-                cls._instances_by_formula[formula] = physical_unit
-                return None
+            # В формулу не должно попадать незарегистрированных label
+            formula_label_set: set[UnitLabel] = set(formula.numerator) | set(formula.denominator)
+            label_set: set[UnitLabel] = set(cls._instances_by_label.keys()) | {label}
+            diff_label_set: set[UnitLabel] = formula_label_set - label_set
+            if diff_label_set:
+                raise UnregisteredLabelInFormulaError(f'Незарегистрированные label в формуле: {diff_label_set}')
+                
+            # регистрируем единицу измерения в реестре
+            cls._instances_by_label[label] = physical_unit
+            cls._instances_by_formula[formula] = physical_unit
+            return None
     
     @classmethod
     def _validate_label_and_formula(cls, label: str | None, formula: Formula) -> None:
@@ -118,7 +130,9 @@ class Unit:
         self.formula = formula
     
     def __str__(self) -> str:
-        return self.label
+        if self.label is not None:
+            return self.label
+        return str(self.formula)
 
     def __eq__(self, value: Unit) -> bool:
         if id(self) == id(value):
@@ -149,8 +163,13 @@ class Unit:
 
 @dataclasses.dataclass(frozen=True)
 class Quantity:
+    """
+    Значение физическая величины (quantity)
+    """
     value: float
+    """Значение"""
     unit: Unit
+    """Единица изменения"""
     
 
 m = meter = Unit(
@@ -160,6 +179,9 @@ m = meter = Unit(
         denominator=Denominator(),
     )
 )
+"""
+Метр. Единица измерения расстояния.
+"""
 
 s = second = Unit(
     label='s',
@@ -168,15 +190,50 @@ s = second = Unit(
         denominator=Denominator(),
     )
 )
+"""
+Секунда. Единица измерения времени.
+"""
+
+
+kg = kilogram = Unit(
+    label='kg',
+    formula=Formula(
+        numerator=Numerator(('kg', )),
+        denominator=Denominator(),
+    )
+)
+"""Килограмм. Единица измерения массы"""
+
 
 empty = Unit(
-    label='',
+    # Пустая строка выбрана специально, чтобы физическая величина (quantity) без единицы измерения
+    # не искажала вывод таких величин (quantities) в виде строк.
+    # Например: пять метров - 5m, а просто пять - 5.
+    label='',  
     formula=Formula(
         numerator=Numerator(),
-        denominator=(),
+        denominator=Denominator(),
     )
 )
 """
-Физическая величина без единицы измерения,
+Физическая величина (quantity) без единицы измерения,
 например, количество в штуках.
 """
+
+meter_per_second = Unit(
+    label=None,
+    formula=Formula(
+        numerator=Numerator('m', ),
+        denominator=Denominator('s', ),
+    ),
+)
+"""м/с - единица измерения скорости"""
+
+N = newton = Unit(
+    label='N',
+    formula=Formula(
+        numerator=Numerator(('kg', 'm')),
+        denominator=Denominator(('s', 's')),
+    )
+)
+"""Ньютон, единица измерения силы"""

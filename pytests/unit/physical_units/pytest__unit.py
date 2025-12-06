@@ -39,12 +39,42 @@ class TestUnit:
         # У основной единицы измерения label должен совпадать с numerator[0], numerator
         with pytest.raises(tm.WrongBaseNumeratorError):
             _ = tm.Unit(label='s', formula=Formula(numerator=tm.Numerator('m'), denominator=tm.Denominator()))
+    
+        # Проверяем, что нельзя создать единицу измерения с такой же формулой под другим именем
+        with pytest.raises(tm.UnitFormulaAlreadyRegisteredError):
+            _ = tm.Unit(
+            label='foo',
+            formula=Formula(
+                numerator=tm.Numerator('m', ),
+                denominator=tm.Denominator('s', ),
+            ),
+        )
         
-        # TODO в формулу не должно попадать незарегистрированных label. 
-        # TODO Именно незарегистрированных, а не базовых. Например: `Н*м` для момента силы
+        # В формулу не должно попадать незарегистрированных label.
+        with pytest.raises(tm.UnregisteredLabelInFormulaError):
+            _ = tm.Unit(
+                label='foo', 
+                formula=tm.Formula(
+                    numerator=tm.Numerator(('foo_bar',)),
+                    denominator=tm.Denominator(('bar_foo', )),
+                )
+            )
+        # Именно незарегистрированных, а не базовых. Например: `Н*м` для момента силы
+        _ = tm.Unit(
+            label=None,
+            formula=tm.Formula(
+                numerator=tm.Numerator(('N', 'm')),
+                denominator=tm.Denominator(),
+            )
+        )
 
 
 class TestMeter:
+    def test__new(self) -> None:
+        # Проверяем, что если создать метр повторно, вернется уже имеющийся метр
+        new_meter = tm.Unit(label='m', formula=tm.meter.formula)
+        assert id(tm.meter) == id(new_meter)
+
     def test_type(self) -> None:
         assert isinstance(tm.meter, tm.Unit)
 
@@ -88,3 +118,21 @@ class TestMeter:
         # проверяем умножение на неподдерживаемый тип
         with pytest.raises(TypeError):
             _ = UnsupportedType() * tm.m
+
+
+class TestEmpty:
+    def test__init(self) -> None:
+        # Нельзя создать пустую единицу измерения (empty) под другим именем
+        with pytest.raises(tm.UnitFormulaAlreadyRegisteredError):
+            _ = tm.Unit(label=None, formula=tm.empty.formula)
+
+    def test_type(self) -> None:
+        assert isinstance(tm.empty, tm.Unit)
+
+    def test__str(self) -> None:
+        """Физическая величина (quantity) без единицы измерения возвращает пустую строку"""
+        assert str(tm.empty) == ''
+
+    def test_empty_is_not_base(self) -> None:
+        """Empty единица не является основной (base) единицей измерения"""
+        assert not tm.empty.formula.is_base_unit()

@@ -22,6 +22,10 @@ class TestFormula:
         ]
     )
     def test_is_base_unit(self, numerator, denominator, is_base) -> None:  # noqa: ANN001
+        """
+        Проверяем алгоритм определения соответствует ли формула основной (base) 
+        или производной (derived) единицы измерения
+        """
         assert tm.Formula(numerator=numerator, denominator=denominator).is_base_unit() is is_base
     
     @pytest.mark.parametrize(
@@ -35,4 +39,7 @@ class TestFormula:
         ]
     )
     def test__reduce_fraction(self, numerator, denominator, result_numerator, result_denominator) -> None: # noqa: ANN001
+        """Проверяем алгоритм сокращения дробей"""
         assert tm.Formula._reduce_fraction(numerator, denominator) == (result_numerator, result_denominator)
+
+    # TODO приведение к строке
