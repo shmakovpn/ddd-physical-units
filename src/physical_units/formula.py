@@ -59,14 +59,15 @@ class Formula:
         
         return Numerator(numerator_accumulator), Denominator(denominator_accumulator)
     
+    def _str__(self) -> str:
+        return f'({".".join(self.numerator)})/({".".join(self.denominator)})'
+    
     def __mul__(self, value: Formula) -> Formula:
         if not isinstance(value, Formula):
             raise TypeError(f'unsupported type "{type(value).__name__}" for __mul__')
         # перемножение формул должно поддерживать сокращение дробей
-        left_numerator: list[UnitLabel] = list(self.numerator)
-        right_numerator: list[UnitLabel] = list(value.numerator)
-        left_denominator: list[UnitLabel] = list(self.denominator)
-        right_denominator: list[UnitLabel] = list(value.denominator)
-
-        unit: UnitLabel
-        # for unit in left_numerator:
+        numerator: Numerator = self.numerator + value.numerator
+        denominator: Denominator = self.denominator + value.denominator
+        reduced_numerator, reduced_denominator = self._reduce_fraction(numerator=numerator, denominator=denominator)
+        return self.__class__(numerator=reduced_numerator, denominator=reduced_denominator)
+    

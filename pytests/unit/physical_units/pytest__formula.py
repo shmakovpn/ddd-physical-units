@@ -42,4 +42,5 @@ class TestFormula:
         """Проверяем алгоритм сокращения дробей"""
         assert tm.Formula._reduce_fraction(numerator, denominator) == (result_numerator, result_denominator)
 
-    # TODO приведение к строке
+    def test__str(self) -> None:
+        numerator = 
